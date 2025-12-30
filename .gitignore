@@ -1,0 +1,8 @@
+target/
+.settings/
+.classpath
+.project
+bin/
+config/
+*.log
+.DS_Store
