@@ -13,20 +13,33 @@ import java.util.List;
 public class ConfigManager {
 
     public static final String KEY_INTERVAL = "interval";
+    // Legacy keys
     public static final String KEY_SOURCE = "source";
     public static final String KEY_DEST = "dest";
 
+    // New keys
+    public static final String KEY_SOURCE_1 = "source1";
+    public static final String KEY_DEST_1 = "dest1";
+    public static final String KEY_SOURCE_2 = "source2";
+    public static final String KEY_DEST_2 = "dest2";
+
     private File configFile;
     private int interval = 15; // default 15 mins
-    private String sourcePath = "";
-    private List<String> destPaths = new ArrayList<>();
+
+    // Profile 1
+    private String sourcePath1 = "";
+    private List<String> destPaths1 = new ArrayList<>();
+
+    // Profile 2
+    private String sourcePath2 = "";
+    private List<String> destPaths2 = new ArrayList<>();
 
     public ConfigManager(String rootInfo) {
         String rootDir = ".";
         if (rootInfo != null && !rootInfo.isEmpty()) {
             rootDir = rootInfo;
         }
-        
+
         File configDir = new File(rootDir, "config");
         if (!configDir.exists()) {
             configDir.mkdirs();
@@ -39,7 +52,9 @@ public class ConfigManager {
             return;
         }
 
-        destPaths.clear();
+        destPaths1.clear();
+        destPaths2.clear();
+
         try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -54,10 +69,14 @@ public class ConfigManager {
                         } catch (NumberFormatException e) {
                             // ignore, keep default
                         }
-                    } else if (KEY_SOURCE.equals(key)) {
-                        this.sourcePath = value;
-                    } else if (KEY_DEST.equals(key)) {
-                        this.destPaths.add(value);
+                    } else if (KEY_SOURCE.equals(key) || KEY_SOURCE_1.equals(key)) {
+                        this.sourcePath1 = value;
+                    } else if (KEY_DEST.equals(key) || KEY_DEST_1.equals(key)) {
+                        this.destPaths1.add(value);
+                    } else if (KEY_SOURCE_2.equals(key)) {
+                        this.sourcePath2 = value;
+                    } else if (KEY_DEST_2.equals(key)) {
+                        this.destPaths2.add(value);
                     }
                 }
             }
@@ -71,16 +90,24 @@ public class ConfigManager {
             // Save Interval
             bw.write(KEY_INTERVAL + "," + interval);
             bw.newLine();
-            
-            // Save Source
-            if (sourcePath != null && !sourcePath.isEmpty()) {
-                bw.write(KEY_SOURCE + "," + sourcePath);
+
+            // Save Profile 1
+            if (sourcePath1 != null && !sourcePath1.isEmpty()) {
+                bw.write(KEY_SOURCE_1 + "," + sourcePath1);
+                bw.newLine();
+            }
+            for (String dest : destPaths1) {
+                bw.write(KEY_DEST_1 + "," + dest);
                 bw.newLine();
             }
 
-            // Save Destinations
-            for (String dest : destPaths) {
-                bw.write(KEY_DEST + "," + dest);
+            // Save Profile 2
+            if (sourcePath2 != null && !sourcePath2.isEmpty()) {
+                bw.write(KEY_SOURCE_2 + "," + sourcePath2);
+                bw.newLine();
+            }
+            for (String dest : destPaths2) {
+                bw.write(KEY_DEST_2 + "," + dest);
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -96,19 +123,55 @@ public class ConfigManager {
         this.interval = interval;
     }
 
-    public String getSourcePath() {
-        return sourcePath;
+    // Getters and Setters for Profile 1
+    public String getSourcePath1() {
+        return sourcePath1;
     }
 
-    public void setSourcePath(String sourcePath) {
-        this.sourcePath = sourcePath;
+    public void setSourcePath1(String p) {
+        this.sourcePath1 = p;
+    }
+
+    public List<String> getDestPaths1() {
+        return destPaths1;
+    }
+
+    public void setDestPaths1(List<String> l) {
+        this.destPaths1 = l;
+    }
+
+    // Getters and Setters for Profile 2
+    public String getSourcePath2() {
+        return sourcePath2;
+    }
+
+    public void setSourcePath2(String p) {
+        this.sourcePath2 = p;
+    }
+
+    public List<String> getDestPaths2() {
+        return destPaths2;
+    }
+
+    public void setDestPaths2(List<String> l) {
+        this.destPaths2 = l;
+    }
+
+    // Legacy/Convenience wrappers if needed, but better to migrate users of this
+    // class.
+    public String getSourcePath() {
+        return getSourcePath1();
+    }
+
+    public void setSourcePath(String p) {
+        setSourcePath1(p);
     }
 
     public List<String> getDestPaths() {
-        return destPaths;
+        return getDestPaths1();
     }
 
-    public void setDestPaths(List<String> destPaths) {
-        this.destPaths = destPaths;
+    public void setDestPaths(List<String> l) {
+        setDestPaths1(l);
     }
 }
