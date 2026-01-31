@@ -23,6 +23,7 @@ public class FileTool {
     private ConfigManager configManager;
     private SyncPanel syncPanel1;
     private SyncPanel syncPanel2;
+    private SyncPanel syncPanel3;
     private Spinner intervalSpinner;
     private Button btnAutoSync;
     private Label statusLabel;
@@ -58,7 +59,7 @@ public class FileTool {
 
     protected void createContents(Display display) {
         shell = new Shell(display);
-        shell.setSize(600, 700); // Increased height for two panels
+        shell.setSize(600, 900); // Increased height for three panels
         shell.setText("File Sync Tool - Dual Mode");
         shell.setLayout(new GridLayout(1, false));
 
@@ -73,6 +74,12 @@ public class FileTool {
         syncPanel2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         syncPanel2.setSourcePath(configManager.getSourcePath2());
         syncPanel2.setDestPaths(configManager.getDestPaths2());
+
+        // --- Sync Panel 3 ---
+        syncPanel3 = new SyncPanel(shell, SWT.NONE, "Sync Profile 3");
+        syncPanel3.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        syncPanel3.setSourcePath(configManager.getSourcePath3());
+        syncPanel3.setDestPaths(configManager.getDestPaths3());
 
         // --- Actions ---
         Group grpActions = new Group(shell, SWT.NONE);
@@ -122,6 +129,10 @@ public class FileTool {
         configManager.setSourcePath2(syncPanel2.getSourcePath());
         configManager.setDestPaths2(syncPanel2.getDestPaths());
 
+        // Save Panel 3
+        configManager.setSourcePath3(syncPanel3.getSourcePath());
+        configManager.setDestPaths3(syncPanel3.getDestPaths());
+
         configManager.setInterval(intervalSpinner.getSelection());
         configManager.save();
     }
@@ -129,10 +140,12 @@ public class FileTool {
     private void performSync() {
         int success1 = syncPanel1.performSync();
         int success2 = syncPanel2.performSync();
+        int success3 = syncPanel3.performSync();
 
         String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
         statusLabel.setText(
-                "Sync finished at " + time + ". Profile 1 Files: " + success1 + ", Profile 2 Files: " + success2);
+                "Sync finished at " + time + ". Profile 1 Files: " + success1 + ", Profile 2 Files: " + success2
+                        + ", Profile 3 Files: " + success3);
     }
 
     private void toggleAutoSync() {

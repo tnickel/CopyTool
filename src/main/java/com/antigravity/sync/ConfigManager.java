@@ -22,6 +22,8 @@ public class ConfigManager {
     public static final String KEY_DEST_1 = "dest1";
     public static final String KEY_SOURCE_2 = "source2";
     public static final String KEY_DEST_2 = "dest2";
+    public static final String KEY_SOURCE_3 = "source3";
+    public static final String KEY_DEST_3 = "dest3";
 
     private File configFile;
     private int interval = 15; // default 15 mins
@@ -33,6 +35,10 @@ public class ConfigManager {
     // Profile 2
     private String sourcePath2 = "";
     private List<String> destPaths2 = new ArrayList<>();
+
+    // Profile 3
+    private String sourcePath3 = "";
+    private List<String> destPaths3 = new ArrayList<>();
 
     public ConfigManager(String rootInfo) {
         String rootDir = ".";
@@ -54,6 +60,7 @@ public class ConfigManager {
 
         destPaths1.clear();
         destPaths2.clear();
+        destPaths3.clear();
 
         try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
             String line;
@@ -77,6 +84,10 @@ public class ConfigManager {
                         this.sourcePath2 = value;
                     } else if (KEY_DEST_2.equals(key)) {
                         this.destPaths2.add(value);
+                    } else if (KEY_SOURCE_3.equals(key)) {
+                        this.sourcePath3 = value;
+                    } else if (KEY_DEST_3.equals(key)) {
+                        this.destPaths3.add(value);
                     }
                 }
             }
@@ -108,6 +119,16 @@ public class ConfigManager {
             }
             for (String dest : destPaths2) {
                 bw.write(KEY_DEST_2 + "," + dest);
+                bw.newLine();
+            }
+
+            // Save Profile 3
+            if (sourcePath3 != null && !sourcePath3.isEmpty()) {
+                bw.write(KEY_SOURCE_3 + "," + sourcePath3);
+                bw.newLine();
+            }
+            for (String dest : destPaths3) {
+                bw.write(KEY_DEST_3 + "," + dest);
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -155,6 +176,23 @@ public class ConfigManager {
 
     public void setDestPaths2(List<String> l) {
         this.destPaths2 = l;
+    }
+
+    // Getters and Setters for Profile 3
+    public String getSourcePath3() {
+        return sourcePath3;
+    }
+
+    public void setSourcePath3(String p) {
+        this.sourcePath3 = p;
+    }
+
+    public List<String> getDestPaths3() {
+        return destPaths3;
+    }
+
+    public void setDestPaths3(List<String> l) {
+        this.destPaths3 = l;
     }
 
     // Legacy/Convenience wrappers if needed, but better to migrate users of this
